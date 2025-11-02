@@ -244,7 +244,7 @@ setInterval(() => {
   tipCounter++;
 }, VOCAB_TIP_INTERVAL);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8000;
 
 app.listen(3001, () => {
   console.log("\n" + "=".repeat(60));

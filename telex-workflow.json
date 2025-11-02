@@ -1,0 +1,27 @@
+{
+  "active": true,
+  "category": "utilities",
+  "description": "Enhanced multilingual dictionary with cultural intelligence",
+  "id": "dictionary-agent-lexiverse",
+  "long_description": "An advanced dictionary agent that provides translations between 9 languages with rich cultural context, etymology, pronunciation guides, and memory-boosting techniques. Built with Mastra framework.\n\nSupported languages: English, Spanish, French, German, Italian, Portuguese, Russian, Japanese, Chinese.\n\nFeatures:\n- Cultural intelligence and formality levels\n- Etymology and word origins\n- Pronunciation guidance\n- Regional variations\n- Synonyms and antonyms\n- Memory-boosting techniques\n- Interactive learning\n\nUse it for translations, definitions, and language learning with cultural awareness.",
+  "name": "Dictionary Agent",
+  "nodes": [
+    {
+      "id": "dictionary_agent_node",
+      "name": "Dictionary Agent",
+      "parameters": {},
+      "position": [
+        800,
+        -100
+      ],
+      "type": "a2a/mastra-a2a-node",
+      "typeVersion": 1,
+      "url": "https://lexiverse.mastra.cloud/a2a/agent/dictionaryAgent"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "short_description": "Multilingual dictionary with cultural intelligence and learning tools"
+}
