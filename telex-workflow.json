@@ -12,31 +12,8 @@
       "type": "a2a/mastra-a2a-node",
       "typeVersion": 1,
       "position": [800, -100],
-      "url": "https://lexiverse.mastra.cloud/a2a/agent/dictionaryAgent",
-      "parameters": {
-        "method": "POST",
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "body": {
-          "jsonrpc": "2.0",
-          "id": "={{ $json.input.taskId || $now }}",
-          "method": "generate",
-          "params": {
-            "messages": [
-              {
-                "role": "user",
-                "parts": [
-                  {
-                    "kind": "text",
-                    "text": "={{ $json.input.text }} translate from {{ $json.input.source_language || 'en' }} to {{ $json.input.target_language || 'es' }}"
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      }
+      "parameters": {},
+      "url": "https://lexiverse.mastra.cloud/a2a/agent/dictionaryAgent"
     }
   ],
   "pinData": {},
