@@ -3,6 +3,7 @@ import { PinoLogger, LogLevel } from "@mastra/loggers";
 import { LibSQLStore } from "@mastra/libsql";
 import express from "express";
 import dotenv from "dotenv";
+import { a2aAgentRoute } from "./routes/a2a-agent-route";
 import pino from "pino";
 
 // Import our dictionary components
@@ -48,6 +49,13 @@ export const mastra = new Mastra({
   },
   observability: {
     default: { enabled: true },
+  },
+  server: {
+    build: {
+      openAPIDocs: true,
+      swaggerUI: true,
+    },
+    apiRoutes: [a2aAgentRoute],
   },
 });
 
@@ -244,7 +252,7 @@ setInterval(() => {
   tipCounter++;
 }, VOCAB_TIP_INTERVAL);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8000;
 
 app.listen(3001, () => {
   console.log("\n" + "=".repeat(60));
