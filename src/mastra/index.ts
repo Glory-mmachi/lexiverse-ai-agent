@@ -244,9 +244,9 @@ setInterval(() => {
   tipCounter++;
 }, VOCAB_TIP_INTERVAL);
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(3001, () => {
+app.listen(PORT, () => {
   console.log("\n" + "=".repeat(60));
   console.log("🚀 DICTIONARY AGENT STARTED");
   console.log("=".repeat(60));
