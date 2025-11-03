@@ -95,67 +95,130 @@ app.get("/health", (req, res) => {
  * Main Agent Endpoint (A2A Protocol)
  * Handles incoming messages from Telex.im
  */
+/**
+ * Main Agent Endpoint (A2A Protocol)
+ * Handles both A2A JSON-RPC format and simple format
+ */
 app.post("/agent", async (req, res) => {
   try {
-    console.log("📨 Received message:", JSON.stringify(req.body, null, 2));
+    console.log("📨 Received request:", JSON.stringify(req.body, null, 2));
 
-    const { message, channelId, userId } = req.body;
+    const body = req.body;
 
-    // Validate required fields
-    if (!message || typeof message !== "string") {
-      console.error("❌ Invalid message format");
-      return res.status(400).json({
-        error: "Message is required and must be a string",
-        text: "Please provide a valid message.",
-        channelId: channelId || "unknown",
-        timestamp: new Date().toISOString(),
+    // Check if this is an A2A JSON-RPC request
+    if (body.jsonrpc === "2.0" && body.id && body.method) {
+      console.log("🔄 Processing A2A JSON-RPC request");
+
+      // Handle A2A format
+      const { messages } = body.params || {};
+      const userMessage = messages?.[0]?.parts?.[0]?.text || "";
+
+      if (!userMessage) {
+        return res.status(400).json({
+          jsonrpc: "2.0",
+          id: body.id,
+          error: {
+            code: -32602,
+            message: "Invalid params: message text is required",
+          },
+        });
+      }
+
+      // Process with your agent
+      const agent = mastra.getAgent("dictionaryAgent");
+      if (!agent) {
+        throw new Error("Dictionary agent not found");
+      }
+
+      const response = await agent.generate([
+        { role: "user", content: userMessage },
+      ]);
+
+      const responseText = response.text || "I couldn't process your request.";
+
+      // Return A2A response format
+      return res.json({
+        jsonrpc: "2.0",
+        id: body.id,
+        result: {
+          artifacts: [
+            {
+              artifactId: "1",
+              name: "dictionaryResponse",
+              parts: [{ kind: "text", text: responseText }],
+            },
+          ],
+        },
       });
+    } else {
+      console.log("🔄 Processing simple format request");
+
+      // Handle your current format
+      const { message, channelId, userId } = body;
+
+      // Validate required fields
+      if (!message || typeof message !== "string") {
+        console.error("❌ Invalid message format");
+        return res.status(400).json({
+          error: "Message is required and must be a string",
+          text: "Please provide a valid message.",
+          channelId: channelId || "unknown",
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      // Get the dictionary agent
+      const agent = mastra.getAgent("dictionaryAgent");
+      if (!agent) {
+        throw new Error("Dictionary agent not found");
+      }
+
+      // Process the message with the agent
+      const response = await agent.generate([
+        { role: "user", content: message },
+      ]);
+
+      // Extract text from response
+      const responseText =
+        response.text || "I apologize, but I could not process your request.";
+
+      // Format response
+      const a2aResponse = {
+        text: responseText,
+        channelId: channelId || "default",
+        timestamp: new Date().toISOString(),
+      };
+
+      console.log("📤 Sending response:", JSON.stringify(a2aResponse, null, 2));
+      res.json(a2aResponse);
     }
-
-    // Get the dictionary agent
-    const agent = mastra.getAgent("dictionaryAgent");
-    if (!agent) {
-      throw new Error("Dictionary agent not found");
-    }
-
-    // Process the message with the agent
-    // The agent will automatically select the right tool (translateTool or defineTool)
-    const response = await agent.generate([
-      {
-        role: "user",
-        content: message,
-      },
-    ]);
-
-    // Extract text from response
-    const responseText =
-      response.text || "I apologize, but I could not process your request.";
-
-    // Format A2A response
-    const a2aResponse = {
-      text: responseText,
-      channelId: channelId || "default",
-      timestamp: new Date().toISOString(),
-    };
-
-    console.log("📤 Sending response:", JSON.stringify(a2aResponse, null, 2));
-    res.json(a2aResponse);
   } catch (error) {
     console.error("❌ Error processing message:", error);
 
-    // Send user-friendly error message
     const errorMessage =
       error instanceof Error ? error.message : "An unexpected error occurred";
 
-    res.status(500).json({
-      error: errorMessage,
-      text: "Sorry, I encountered an error processing your request. Please try again or rephrase your question.",
-      channelId: req.body?.channelId || "unknown",
-      timestamp: new Date().toISOString(),
-    });
+    // Return appropriate format based on request type
+    if (req.body.jsonrpc === "2.0") {
+      res.status(500).json({
+        jsonrpc: "2.0",
+        id: req.body.id,
+        error: {
+          code: -32603,
+          message: "Internal error",
+          data: { details: errorMessage },
+        },
+      });
+    } else {
+      res.status(500).json({
+        error: errorMessage,
+        text: "Sorry, I encountered an error processing your request. Please try again or rephrase your question.",
+        channelId: req.body?.channelId || "unknown",
+        timestamp: new Date().toISOString(),
+      });
+    }
   }
 });
-
 /**
  * Cache Stats Endpoint
  * Returns current cache statistics

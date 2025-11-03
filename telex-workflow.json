@@ -9,14 +9,34 @@
     {
       "id": "dictionary_agent_node",
       "name": "Dictionary Agent",
-      "parameters": {},
-      "position": [
-        800,
-        -100
-      ],
+      "parameters": {
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "={{ $json.input.taskId || $now }}",
+          "method": "generate",
+          "params": {
+            "messages": [
+              {
+                "role": "user",
+                "parts": [
+                  {
+                    "kind": "text",
+                    "text": "={{ $json.input.text }} translate from {{ $json.input.source_language || 'en' }} to {{ $json.input.target_language || 'es' }}"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "position": [800, -100],
       "type": "a2a/mastra-a2a-node",
       "typeVersion": 1,
-      "url": "https://lexiverse.mastra.cloud/a2a/agent/dictionaryAgent"
+      "url": "https://lexiverse-ai-agent-glory-mmachi5066-5y7vyroj.leapcell.dev/agent"
     }
   ],
   "pinData": {},
