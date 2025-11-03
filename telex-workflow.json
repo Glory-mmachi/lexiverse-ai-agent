@@ -9,6 +9,10 @@
     {
       "id": "dictionary_agent_node",
       "name": "Dictionary Agent",
+      "type": "a2a/mastra-a2a-node",
+      "typeVersion": 1,
+      "position": [800, -100],
+      "url": "https://lexiverse.mastra.cloud/a2a/agent/dictionaryAgent",
       "parameters": {
         "method": "POST",
         "headers": {
@@ -32,11 +36,7 @@
             ]
           }
         }
-      },
-      "position": [800, -100],
-      "type": "a2a/mastra-a2a-node",
-      "typeVersion": 1,
-      "url": "https://lexiverse-ai-agent-glory-mmachi5066-5y7vyroj.leapcell.dev/agent"
+      }
     }
   ],
   "pinData": {},
