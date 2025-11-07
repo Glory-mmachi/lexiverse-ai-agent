@@ -36,16 +36,26 @@ interface DictionaryResponse {
 /**
  * Enhanced Translation Tool
  * Uses MyMemory Translation API (free, no key required)
- * Supports: en, es, fr, de, it, pt, ru, ja, zh
+ * Supports 40+ languages including African languages!
  */
 export const translateTool = createTool({
   id: "translate-text",
   description:
-    "Translate text between languages with rich contextual information. Supported languages: en (English), es (Spanish), fr (French), de (German), it (Italian), pt (Portuguese), ru (Russian), ja (Japanese), zh (Chinese). Returns translation plus metadata for contextual enrichment.",
+    "Translate text between 40+ languages with rich contextual information. " +
+    "Supported languages include: " +
+    "European (en, es, fr, de, it, pt, nl, sv, no, da, fi, pl, cs, ro, hu, el), " +
+    "Asian (zh, ja, ko, hi, ar, th, vi, id), " +
+    "African (ig-Igbo, yo-Yoruba, ha-Hausa, sw-Swahili, zu-Zulu, xh-Xhosa, am-Amharic), " +
+    "and others (ru, tr, fa, he). " +
+    "Returns translation plus metadata for contextual enrichment.",
   inputSchema: z.object({
     text: z.string().describe("The text to translate"),
-    sourceLang: z.string().describe("Source language code (e.g., en, es, fr)"),
-    targetLang: z.string().describe("Target language code (e.g., en, es, fr)"),
+    sourceLang: z
+      .string()
+      .describe("Source language code (e.g., en, es, ig for Igbo)"),
+    targetLang: z
+      .string()
+      .describe("Target language code (e.g., en, es, ig for Igbo)"),
   }),
   outputSchema: z.object({
     original: z.string(),
@@ -72,7 +82,6 @@ export const translateTool = createTool({
 
     const cacheKey = `translate:${text}:${sourceLang}:${targetLang}`;
 
-    // Language name mapping for richer context
     const languageNames: Record<string, string> = {
       en: "English",
       es: "Spanish",
@@ -80,9 +89,35 @@ export const translateTool = createTool({
       de: "German",
       it: "Italian",
       pt: "Portuguese",
-      ru: "Russian",
-      ja: "Japanese",
+      nl: "Dutch",
+      sv: "Swedish",
+      no: "Norwegian",
+      da: "Danish",
+      fi: "Finnish",
+      pl: "Polish",
+      cs: "Czech",
+      ro: "Romanian",
+      hu: "Hungarian",
+      el: "Greek",
       zh: "Chinese",
+      ja: "Japanese",
+      ko: "Korean",
+      hi: "Hindi",
+      ar: "Arabic",
+      th: "Thai",
+      vi: "Vietnamese",
+      id: "Indonesian",
+      ig: "Igbo",
+      yo: "Yoruba",
+      ha: "Hausa",
+      sw: "Swahili",
+      zu: "Zulu",
+      xh: "Xhosa",
+      am: "Amharic",
+      ru: "Russian",
+      tr: "Turkish",
+      fa: "Persian",
+      he: "Hebrew",
     };
 
     // Check cache first
@@ -144,10 +179,7 @@ export const translateTool = createTool({
 });
 
 /**
- * Enhanced Definition Tool
- * Uses Free Dictionary API (free, no key required)
- * Only supports English words
- * Returns comprehensive word information including etymology, phonetics, synonyms, antonyms
+ * Definition Tool
  */
 export const defineTool = createTool({
   id: "define-word",
@@ -192,7 +224,7 @@ export const defineTool = createTool({
     }
 
     try {
-      // Call Free Dictionary API
+      // Call Dictionary API
       const response = await fetch(
         `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(normalizedWord)}`
       );
@@ -214,7 +246,7 @@ export const defineTool = createTool({
 
       const firstEntry = data[0];
 
-      // Extract phonetic (pronunciation)
+      // Extract phonetic 
       const phonetic =
         firstEntry.phonetic || firstEntry.phonetics?.[0]?.text || undefined;
 
@@ -224,13 +256,13 @@ export const defineTool = createTool({
       // Extract all meanings with their details
       const meanings = firstEntry.meanings.flatMap((meaning) => {
         return meaning.definitions.slice(0, 3).map((def) => {
-          // Get synonyms and antonyms from both definition level and meaning level
+        
           const synonyms = [
             ...(def.synonyms || []),
             ...(meaning.synonyms || []),
           ]
-            .filter((s, i, arr) => arr.indexOf(s) === i) // Remove duplicates
-            .slice(0, 5); // Limit to 5
+            .filter((s, i, arr) => arr.indexOf(s) === i) 
+            .slice(0, 5); 
 
           const antonyms = [
             ...(def.antonyms || []),
